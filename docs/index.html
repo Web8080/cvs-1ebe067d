@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>UK Sponsor Tech Roles</title>
+<style>
+  :root{
+    --bg:#0b0f17; --panel:#141a26; --panel2:#1b2333; --line:#26314a;
+    --txt:#e6ecf7; --dim:#8b9ab5; --accent:#4da3ff; --good:#3ddc97; --warn:#ffb454;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+       font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  header{position:sticky;top:0;z-index:5;background:rgba(11,15,23,.95);
+         backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:14px 16px}
+  h1{margin:0 0 2px;font-size:16px;letter-spacing:.2px}
+  .sub{color:var(--dim);font-size:12px}
+  .live{display:inline-flex;align-items:center;gap:6px;color:var(--good);font-size:12px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--good);
+       animation:p 1.6s infinite}
+  @keyframes p{0%,100%{opacity:1}50%{opacity:.25}}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  input,select{background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    border-radius:8px;padding:7px 10px;font-size:13px}
+  input{flex:1;min-width:150px}
+  .wrap{padding:14px 16px 40px;display:grid;gap:10px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:13px 14px;text-decoration:none;color:inherit;display:block;transition:.15s}
+  .card{position:relative}
+  .card.done{opacity:.4}
+  .card.done .t{text-decoration:line-through}
+  .card.done .co{text-decoration:line-through}
+  .lnk{text-decoration:none;color:inherit;display:block}
+  .mark{position:absolute;top:11px;right:11px;background:var(--panel2);color:var(--dim);
+    border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-size:11.5px;
+    cursor:pointer;font-weight:600}
+  .mark:hover{border-color:var(--good);color:var(--good)}
+  .card.done .mark{color:var(--warn);border-color:#6b5423}
+  .cvtag{color:#7cc4ff;border-color:#29527d;text-decoration:none;font-weight:600}
+  .cvtag:hover{border-color:var(--accent);color:var(--accent)}
+  .tag.unk{color:var(--warn);border-color:#6b5423}
+  .t{padding-right:80px}
+  .card:hover{border-color:var(--accent);background:var(--panel2);transform:translateY(-1px)}
+  @media (max-width:480px){
+    .mark{position:static;display:block;width:100%;margin-top:10px;text-align:center;
+      order:99;padding:8px 10px;font-size:12.5px}
+    .t{padding-right:0}
+    .card{display:flex;flex-direction:column}
+  }
+  .t{font-weight:600;font-size:14.5px;margin-bottom:3px}
+  .co{color:var(--accent);font-size:13px}
+  .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px;font-size:11.5px;color:var(--dim)}
+  .tag{background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+  .sal{color:var(--good);font-weight:600}
+  .ver{color:var(--good);border-color:#2c6b52}
+  .fit{font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:999px;
+       vertical-align:middle;margin-left:6px;text-transform:uppercase;letter-spacing:.4px}
+  .f-excellent{background:#0f3d2a;color:#4ade80;border:1px solid #2c6b52}
+  .f-strong{background:#12314d;color:#7cc4ff;border:1px solid #29527d}
+  .f-possible{background:#3a2f12;color:#e3b341;border:1px solid #6b5423}
+  .f-weak{background:#2a2f3a;color:#7d8798;border:1px solid #39404f}
+  .ctr{color:var(--warn)}
+  .empty{color:var(--dim);text-align:center;padding:40px 10px}
+  .count{font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<header>
+  <h1>UK Sponsor-Licensed Tech Roles</h1>
+  <div class="sub">
+    <span class="count" id="n">0</span> shown · <span class="count" id="na">0</span> applied ·
+    every employer matched to the GOV.UK Skilled Worker register (24 Aug 2026) ·
+    <span class="live" style="color:var(--dim)">snapshot, not live</span>
+    <span id="upd"></span>
+  </div>
+  <div class="bar">
+    <input id="q" placeholder="Search title, company, location…">
+    <select id="show">
+      <option value="open">Hide applied</option>
+      <option value="all">Show all</option>
+      <option value="applied">Applied only</option>
+    </select>
+    <select id="fitmin">
+      <option value="">Any match</option>
+      <option value="strong">Strong+ only</option>
+      <option value="excellent">Excellent only</option>
+    </select>
+    <select id="kind">
+      <option value="">All sources</option>
+      <option value="linkedin">LinkedIn</option>
+      <option value="sponsor-site">Employer site (direct)</option>
+      <option value="wellfound">Wellfound</option>
+      <option value="cvlibrary">CV-Library</option>
+      <option value="remote-global">Global remote</option>
+      <option value="ats-direct">Employer ATS (direct)</option>
+      <option value="permanent">Job board · permanent</option>
+      <option value="contract">Job board · contract</option>
+    </select>
+    <select id="sort">
+      <option value="fit">Best CV match</option>
+      <option value="posted">Newest</option>
+      <option value="salary">Salary high→low</option>
+      <option value="company">Company A→Z</option>
+    </select>
+  </div>
+</header>
+<div class="wrap" id="list"><div class="empty">Loading…</div></div>
+<script>
+let ROLES=[];
+const $=s=>document.querySelector(s);
+const money=r=>{
+  const a=r.salary_from,b=r.salary_to;
+  if(!a&&!b) return 'Salary n/d';
+  if(a&&b&&a!==b) return '£'+a.toLocaleString()+' – £'+b.toLocaleString();
+  return '£'+(a||b).toLocaleString();
+};
+function render(){
+  const q=$('#q').value.toLowerCase().trim();
+  const kind=$('#kind').value, sort=$('#sort').value;
+  let rows=ROLES.filter(r=>{
+    const sh=$('#show').value;
+    if(sh==='open' && r.applied) return false;
+    if(sh==='applied' && !r.applied) return false;
+    if(kind && r.kind!==kind) return false;
+    const fm=$('#fitmin').value;
+    if(fm==='strong' && !['strong','excellent'].includes(r.fit_band)) return false;
+    if(fm==='excellent' && r.fit_band!=='excellent') return false;
+    if(!q) return true;
+    return (r.title+' '+r.employer+' '+r.location+' '+r.sponsor_town).toLowerCase().includes(q);
+  });
+  if(sort==='fit') rows.sort((a,b)=>b.fit-a.fit);
+  else if(sort==='salary') rows.sort((a,b)=>(b.salary_from||0)-(a.salary_from||0));
+  else if(sort==='company') rows.sort((a,b)=>a.employer.localeCompare(b.employer));
+  $('#n').textContent=rows.length;
+  $('#na').textContent=ROLES.filter(r=>r.applied).length;
+  $('#list').innerHTML = rows.length ? rows.map(r=>`
+    <div class="card${r.applied?' done':''}">
+      <button class="mark" data-key="${esc(r.employer)}|${esc(r.title)}|${esc(r.url)}">${r.applied?'\u21a9 undo':'Mark applied'}</button>
+      <a class="lnk" href="${r.url}" target="_blank" rel="noopener">
+        <div class="t">${esc(r.title)} <span class="fit f-${r.fit_band}">${r.fit_band}</span></div>
+        <div class="co">${esc(r.employer)}</div>
+      </a>
+      <div class="meta">
+        <span class="tag sal">${money(r)}</span>
+        <span class="tag${r.location_known?'':' unk'}">${r.location_known?esc(r.location||'UK'):'location not confirmed'}</span>
+        <span class="tag${r.kind==='contract'?' ctr':''}">${r.kind==='contract'?'Contract':'Permanent'}</span>
+        <span class="tag">\u2713 sponsor \u00b7 ${esc(r.sponsor_town||'UK')}</span>
+        ${r.apply==='no'?'<span class="tag ctr">\u26a0 no apply button found</span>':''}
+        ${r.cv?`<a class="tag cvtag" href="./cvs/${encodeURIComponent(r.cv)}" download title="Tailored CV for this job">\u2b73 tailored CV</a>`:''}
+        ${r.posted?`<span class="tag">posted ${esc(r.posted)}</span>`:
+          (r.checked?`<span class="tag">checked ${esc(r.checked)}</span>`:'<span class="tag unk">no date on source</span>')}
+        ${r.status==='live'?'<span class="tag ver">\u2713 verified open</span>':''}
+        ${r.kind==='sponsor-site'?'<span class="tag">direct from employer site</span>':''}
+        ${r.expires?`<span class="tag">closes ${esc(r.expires)}</span>`:''}
+      </div>
+    </div>`).join('') : '<div class="empty">No roles match those filters.</div>';
+  document.querySelectorAll('.mark').forEach(b=>{
+    b.onclick=ev=>{
+      ev.preventDefault(); ev.stopPropagation();
+      const key=b.dataset.key;
+      const row=ROLES.find(x=>`${x.employer}|${x.title}|${x.url}`===key);
+      if(!row) return;
+      row.applied=!row.applied;
+      saveApplied(key, row.applied);
+      render();
+    };
+  });
+}
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+// Static hosting has no server to write to, so "applied" state lives in this
+// browser's localStorage. It is per-device: marking a job applied on your
+// phone will not show as applied on your laptop, and vice versa.
+const APPLIED_KEY = 'uk-sponsor-roles-applied-v1';
+function loadAppliedSet(){
+  try{ return new Set(JSON.parse(localStorage.getItem(APPLIED_KEY)||'[]')); }
+  catch(e){ return new Set(); }
+}
+function saveApplied(key, on){
+  const s=loadAppliedSet();
+  on ? s.add(key) : s.delete(key);
+  localStorage.setItem(APPLIED_KEY, JSON.stringify([...s]));
+}
+async function poll(){
+  try{
+    const r=await fetch('./roles.json',{cache:'no-store'});
+    const d=await r.json();
+    const applied=loadAppliedSet();
+    d.forEach(row=>{ row.applied = applied.has(`${row.employer}|${row.title}|${row.url}`); });
+    ROLES=d; render();
+    $('#upd').textContent='· snapshot from last refresh';
+  }catch(e){}
+}
+['#q','#kind','#sort','#fitmin','#show'].forEach(s=>$(s).addEventListener('input',render));
+poll();
+</script>
+</body>
+</html>
