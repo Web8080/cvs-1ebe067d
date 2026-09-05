@@ -186,8 +186,11 @@ async function poll(){
   try{
     const r=await fetch('./roles.json',{cache:'no-store'});
     const d=await r.json();
+    // roles.json already carries applied=true/false baked in from the
+    // real desktop session at export time; localStorage only ever ADDS to
+    // that (marks made on this device), it must never erase server truth
     const applied=loadAppliedSet();
-    d.forEach(row=>{ row.applied = applied.has(`${row.employer}|${row.title}|${row.url}`); });
+    d.forEach(row=>{ row.applied = !!row.applied || applied.has(`${row.employer}|${row.title}|${row.url}`); });
     ROLES=d; render();
     $('#upd').textContent='· snapshot from last refresh';
   }catch(e){}
