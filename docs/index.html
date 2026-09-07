@@ -72,7 +72,7 @@
   <div class="sub">
     <span class="count" id="n">0</span> shown · <span class="count" id="na">0</span> applied ·
     every employer matched to the GOV.UK Skilled Worker register (24 Aug 2026) ·
-    <span class="live" style="color:var(--dim)">snapshot, not live</span>
+    <span class="live" id="sync" style="color:var(--warn)">connecting...</span>
     <span id="upd"></span>
   </div>
   <div class="bar">
@@ -137,7 +137,7 @@ function render(){
   $('#na').textContent=ROLES.filter(r=>r.applied).length;
   $('#list').innerHTML = rows.length ? rows.map(r=>`
     <div class="card${r.applied?' done':''}">
-      <button class="mark" data-key="${esc(r.employer)}|${esc(r.title)}|${esc(r.url)}">${r.applied?'\u21a9 undo':'Mark applied'}</button>
+      <button class="mark" data-key="${esc(akey(r))}">${r.applied?'\u21a9 undo':'Mark applied'}</button>
       <a class="lnk" href="${r.url}" target="_blank" rel="noopener">
         <div class="t">${esc(r.title)} <span class="fit f-${r.fit_band}">${r.fit_band}</span></div>
         <div class="co">${esc(r.employer)}</div>
@@ -160,7 +160,7 @@ function render(){
     b.onclick=ev=>{
       ev.preventDefault(); ev.stopPropagation();
       const key=b.dataset.key;
-      const row=ROLES.find(x=>`${x.employer}|${x.title}|${x.url}`===key);
+      const row=ROLES.find(x=>akey(x)===key);
       if(!row) return;
       row.applied=!row.applied;
       saveApplied(key, row.applied);
@@ -169,18 +169,42 @@ function render(){
   });
 }
 function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-// Static hosting has no server to write to, so "applied" state lives in this
-// browser's localStorage. It is per-device: marking a job applied on your
-// phone will not show as applied on your laptop, and vice versa.
+// Applied-marks live in a shared Upstash Redis set, so a mark made on the
+// phone shows on the laptop and vice versa. localStorage is kept only as an
+// offline cache so the page still renders if the network call fails.
+const UP_URL = 'https://good-bison-103618.upstash.io';
+const UP_TOK = 'gQAAAAAAAZTCAAIgcDI3OTQ2ZjI1NDdhMjg0YWFkYmMyNmZmZjZiOTE0NGI4ZQ';
 const APPLIED_KEY = 'uk-sponsor-roles-applied-v1';
-function loadAppliedSet(){
+// stable id: employer + normalised title, never the URL (a re-posted job
+// changes its URL and used to detach the mark, making it reappear)
+function akey(r){
+  const n = s => (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'');
+  return n(r.employer) + '|' + n(r.title);
+}
+function cacheGet(){
   try{ return new Set(JSON.parse(localStorage.getItem(APPLIED_KEY)||'[]')); }
   catch(e){ return new Set(); }
 }
-function saveApplied(key, on){
-  const s=loadAppliedSet();
+function cacheSet(s){
+  try{ localStorage.setItem(APPLIED_KEY, JSON.stringify([...s])); }catch(e){}
+}
+async function up(parts){
+  const path = parts.map(encodeURIComponent).join('/');
+  const r = await fetch(UP_URL+'/'+path, {headers:{Authorization:'Bearer '+UP_TOK}});
+  if(!r.ok) throw new Error('upstash '+r.status);
+  return (await r.json()).result;
+}
+async function loadRemote(){
+  const members = await up(['smembers','applied']);
+  const s = new Set(members||[]);
+  cacheSet(s);
+  return s;
+}
+async function saveApplied(key, on){
+  const s = cacheGet();
   on ? s.add(key) : s.delete(key);
-  localStorage.setItem(APPLIED_KEY, JSON.stringify([...s]));
+  cacheSet(s);                                   // optimistic
+  await up([on?'sadd':'srem','applied',key]);    // shared source of truth
 }
 async function poll(){
   try{
@@ -189,8 +213,17 @@ async function poll(){
     // roles.json already carries applied=true/false baked in from the
     // real desktop session at export time; localStorage only ever ADDS to
     // that (marks made on this device), it must never erase server truth
-    const applied=loadAppliedSet();
-    d.forEach(row=>{ row.applied = !!row.applied || applied.has(`${row.employer}|${row.title}|${row.url}`); });
+    let applied;
+    try{
+      applied = await loadRemote();
+      const el=document.getElementById('sync');
+      if(el){ el.textContent='synced across your devices'; el.style.color='var(--good)'; }
+    }catch(e){
+      applied = cacheGet();
+      const el=document.getElementById('sync');
+      if(el){ el.textContent='offline - showing this device only'; el.style.color='var(--warn)'; }
+    }
+    d.forEach(row=>{ row.applied = applied.has(akey(row)); });
     ROLES=d; render();
     $('#upd').textContent='· snapshot from last refresh';
   }catch(e){}
