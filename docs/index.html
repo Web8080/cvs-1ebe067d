@@ -95,6 +95,7 @@
       <option value="cvlibrary">CV-Library</option>
       <option value="remote-global">Global remote</option>
       <option value="ats-direct">Employer ATS (direct)</option>
+      <option value="contract-work">Contract / freelance (no sponsor needed)</option>
       <option value="permanent">Job board · permanent</option>
       <option value="contract">Job board · contract</option>
     </select>
@@ -145,8 +146,10 @@ function render(){
       <div class="meta">
         <span class="tag sal">${money(r)}</span>
         <span class="tag${r.location_known?'':' unk'}">${r.location_known?esc(r.location||'UK'):'location not confirmed'}</span>
-        <span class="tag${r.kind==='contract'?' ctr':''}">${r.kind==='contract'?'Contract':'Permanent'}</span>
-        <span class="tag">\u2713 sponsor \u00b7 ${esc(r.sponsor_town||'UK')}</span>
+        <span class="tag${(r.kind==='contract'||r.kind==='contract-work')?' ctr':''}">${(r.kind==='contract'||r.kind==='contract-work')?'Contract':'Permanent'}</span>
+        ${r.kind==='contract-work'
+            ? '<span class="tag ctr">contract \u00b7 no sponsor check</span>'
+            : `<span class="tag">\u2713 sponsor \u00b7 ${esc(r.sponsor_town||'UK')}</span>`}
         ${r.apply==='no'?'<span class="tag ctr">\u26a0 no apply button found</span>':''}
         ${r.cv?`<a class="tag cvtag" href="./cvs/${encodeURIComponent(r.cv)}" download title="Tailored CV for this job">\u2b73 tailored CV</a>`:''}
         ${r.posted?`<span class="tag">posted ${esc(r.posted)}</span>`:
