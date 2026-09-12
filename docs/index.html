@@ -165,6 +165,12 @@ function render(){
         ${r.sponsor_name
             ? `<span class="tag">\u2713 sponsor \u00b7 ${esc(r.sponsor_town||'UK')}</span>`
             : '<span class="tag ctr">no sponsor check</span>'}
+        ${r.work_auth==='none_required'
+            ? '<span class="tag ver">\u2713 no work permit needed (JD checked)</span>'
+            : r.work_auth==='required'
+              ? '<span class="tag ctr">\u26a0 needs local work rights</span>'
+              : (r.kind==='worldwide-remote'
+                 ? '<span class="tag unk">work permit unclear \u2014 check JD</span>' : '')}
         ${r.apply==='no'?'<span class="tag ctr">\u26a0 no apply button found</span>':''}
         ${r.cv?`<a class="tag cvtag" href="./cvs/${encodeURIComponent(r.cv)}" download title="Tailored CV for this job">\u2b73 tailored CV</a>`:''}
         ${r.posted?`<span class="tag">posted ${esc(r.posted)}</span>`:
