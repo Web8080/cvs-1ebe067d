@@ -77,6 +77,11 @@
   </div>
   <div class="bar">
     <input id="q" placeholder="Search title, company, location…">
+    <select id="worktype">
+      <option value="freelance">Freelance / contract only</option>
+      <option value="">All roles</option>
+      <option value="permanent">Permanent (sponsor-verified)</option>
+    </select>
     <select id="show">
       <option value="open">Hide applied</option>
       <option value="all">Show all</option>
@@ -128,6 +133,9 @@ function render(){
     const sh=$('#show').value;
     if(sh==='open' && r.applied) return false;
     if(sh==='applied' && !r.applied) return false;
+    const wt=$('#worktype').value;
+    if(wt==='freelance' && !r.freelance) return false;
+    if(wt==='permanent' && r.freelance) return false;
     if(kind && r.kind!==kind) return false;
     const fm=$('#fitmin').value;
     if(fm==='strong' && !['strong','excellent'].includes(r.fit_band)) return false;
@@ -150,7 +158,7 @@ function render(){
       <div class="meta">
         <span class="tag sal">${money(r)}</span>
         <span class="tag${r.location_known?'':' unk'}">${r.location_known?esc(r.location||'UK'):'location not confirmed'}</span>
-        <span class="tag${(r.kind==='contract'||r.kind==='contract-work')?' ctr':''}">${(r.kind==='contract'||r.kind==='contract-work')?'Contract':'Permanent'}</span>
+        <span class="tag${r.freelance?' ctr':''}">${r.freelance?'Freelance / contract':'Permanent'}</span>
         ${r.kind==='contract-work'
             ? '<span class="tag ctr">contract \u00b7 no sponsor check</span>'
             : `<span class="tag">\u2713 sponsor \u00b7 ${esc(r.sponsor_town||'UK')}</span>`}
@@ -235,7 +243,7 @@ async function poll(){
     $('#upd').textContent='· snapshot from last refresh';
   }catch(e){}
 }
-['#q','#kind','#sort','#fitmin','#show'].forEach(s=>$(s).addEventListener('input',render));
+['#q','#kind','#sort','#fitmin','#show','#worktype'].forEach(s=>$(s).addEventListener('input',render));
 poll();
 </script>
 </body>
