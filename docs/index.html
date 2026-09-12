@@ -159,9 +159,9 @@ function render(){
         <span class="tag sal">${money(r)}</span>
         <span class="tag${r.location_known?'':' unk'}">${r.location_known?esc(r.location||'UK'):'location not confirmed'}</span>
         <span class="tag${r.freelance?' ctr':''}">${r.freelance?'Freelance / contract':'Permanent'}</span>
-        ${r.kind==='contract-work'
-            ? '<span class="tag ctr">contract \u00b7 no sponsor check</span>'
-            : `<span class="tag">\u2713 sponsor \u00b7 ${esc(r.sponsor_town||'UK')}</span>`}
+        ${r.sponsor_name
+            ? `<span class="tag">\u2713 sponsor \u00b7 ${esc(r.sponsor_town||'UK')}</span>`
+            : '<span class="tag ctr">no sponsor check</span>'}
         ${r.apply==='no'?'<span class="tag ctr">\u26a0 no apply button found</span>':''}
         ${r.cv?`<a class="tag cvtag" href="./cvs/${encodeURIComponent(r.cv)}" download title="Tailored CV for this job">\u2b73 tailored CV</a>`:''}
         ${r.posted?`<span class="tag">posted ${esc(r.posted)}</span>`:
