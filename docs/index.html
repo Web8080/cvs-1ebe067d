@@ -81,6 +81,7 @@
       <option value="freelance">Freelance / contract only</option>
       <option value="">All roles</option>
       <option value="permanent">Permanent (sponsor-verified)</option>
+      <option value="worldwide">Worldwide remote (no work permit)</option>
     </select>
     <select id="show">
       <option value="open">Hide applied</option>
@@ -106,6 +107,7 @@
       <option value="dev">Automation / Web / Full-stack</option>
       <option value="dev-contract">Automation / Web / Full-stack · contract</option>
       <option value="permanent">Job board · permanent</option>
+      <option value="worldwide-remote">Worldwide remote</option>
       <option value="contract">Job board · contract</option>
     </select>
     <select id="sort">
@@ -136,6 +138,7 @@ function render(){
     const wt=$('#worktype').value;
     if(wt==='freelance' && !r.freelance) return false;
     if(wt==='permanent' && r.freelance) return false;
+    if(wt==='worldwide' && !r.worldwide) return false;
     if(kind && r.kind!==kind) return false;
     const fm=$('#fitmin').value;
     if(fm==='strong' && !['strong','excellent'].includes(r.fit_band)) return false;
