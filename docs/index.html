@@ -82,6 +82,7 @@
       <option value="">All roles</option>
       <option value="permanent">Permanent (sponsor-verified)</option>
       <option value="worldwide">Worldwide remote (no work permit)</option>
+      <option value="no_login">No login needed — quick apply</option>
     </select>
     <select id="show">
       <option value="open">Hide applied</option>
@@ -139,6 +140,7 @@ function render(){
     if(wt==='freelance' && !r.freelance) return false;
     if(wt==='permanent' && r.freelance) return false;
     if(wt==='worldwide' && !r.worldwide) return false;
+    if(wt==='no_login' && !r.no_login) return false;
     if(kind && r.kind!==kind) return false;
     const fm=$('#fitmin').value;
     if(fm==='strong' && !['strong','excellent'].includes(r.fit_band)) return false;
@@ -165,6 +167,7 @@ function render(){
         ${r.sponsor_name
             ? `<span class="tag">\u2713 sponsor \u00b7 ${esc(r.sponsor_town||'UK')}</span>`
             : '<span class="tag ctr">no sponsor check</span>'}
+        ${r.no_login?'<span class="tag ver">⚡ no login — quick apply</span>':''}
         ${r.work_auth==='none_required'
             ? '<span class="tag ver">\u2713 no work permit needed (JD checked)</span>'
             : r.work_auth==='required'
